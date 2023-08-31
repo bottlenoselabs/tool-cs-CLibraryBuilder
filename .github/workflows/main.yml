@@ -1,0 +1,23 @@
+name: "Main"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [assigned, opened, synchronize, reopened]
+
+jobs:
+
+  bindgen-job:
+    name: "Bindgen"
+    uses: "./.github/workflows/bindgen.yml"
+
+  build-job:
+    name: "Build"
+    needs: [bindgen-job]
+    uses: "./.github/workflows/build.yml"
+
+  commit-job:
+    name: "Commit"
+    needs: [bindgen-job, build-job]
+    if: github.actor == 'dependabot[bot]'
+    uses: "./.github/workflows/commit.yml"
